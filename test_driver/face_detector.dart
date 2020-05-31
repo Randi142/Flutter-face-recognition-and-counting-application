@@ -1,0 +1,28 @@
+part of 'firebase_ml_vision.dart';
+
+void faceDetectorTests() {
+  group('$FaceDetector', () {
+    final FaceDetector detector = FirebaseVision.instance.faceDetector(
+      const FaceDetectorOptions(
+          enableContours: true, mode: FaceDetectorMode.accurate),
+    );
+
+    test('processImage', () async {
+      final String tmpFilename = await _loadImage('assets/test_face.jpg');
+      final FirebaseVisionImage visionImage =
+          FirebaseVisionImage.fromFilePath(tmpFilename);
+
+      final List<Face> faces = await detector.processImage(visionImage);
+
+      expect(faces.length, 1);
+      expect(
+        faces[0].getContour(FaceContourType.allPoints).positionsList,
+        isNotEmpty,
+      );
+    });
+
+    test('close', () {
+      expect(detector.close(), completes);
+    });
+  });
+}
